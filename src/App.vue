@@ -1,32 +1,259 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+  <v-app>
+    <v-container>
+      <v-row>
+        <v-col>
+          <h1>{{ heading }}</h1>
+          <v-btn @click="generatePDF"> Generate PDF </v-btn>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <ul>
+            <li v-for="item in listItems">
+              {{ item.title }} : {{ item.content }}
+            </li>
+          </ul>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <table id="my-table">
+            <thead>
+              <th>Title</th>
+              <th>Content</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Name</td>
+                <td>Saddam Hossain</td>
+              </tr>
+              <tr>
+                <td>Age</td>
+                <td>45</td>
+              </tr>
+            </tbody>
+          </table>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-app>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+export default {
+  name: "App",
 
-#nav {
-  padding: 30px;
-}
+  components: {},
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+  data: () => ({
+    heading: "Tax Calculator v1",
+    listItems: [
+      { title: "Assessment Year", content: "2020-21" },
+      {
+        title: "Return submitted under section 82BB? (tick one)",
+        content: "Yes",
+      },
+      { title: "Name of the Assessee", content: "Md. Saddam Hossain Razo" },
+    ],
+    someText:
+      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam, iure.",
+  }),
+  methods: {
+    generatePDF() {
+      const columns = [
+        { title: "Discription", dataKey: "discription" },
+        { title: "Quantity", dataKey: "quantity" },
+        { title: "UnitPrice", dataKey: "unitprice" },
+        { title: "Disc%", dataKey: "disk" },
+        { title: "Vat%", dataKey: "vat" },
+        { title: "ExclTotal", dataKey: "excltotal" },
+        { title: "InclTotal", dataKey: "incltotal" },
+      ];
+      const doc = new jsPDF({
+        orientation: "p",
+        unit: "in",
+        format: "a4",
+      });
+      var width = doc.internal.pageSize.getWidth();
+      var height = doc.internal.pageSize.getHeight();
+      var lineHeight = 0.25;
+      var topMargin = 1.0;
+      var leftMargin = 0.9;
+      var rightMargin = 0.9;
+      var bottomMargin = 1.0;
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+      doc.setFont("times", "bold").setFontSize(16);
+      doc.text("SCHEDULE 24A", width / 2.0, topMargin, "center");
+
+      doc.setFont("times", "bold").setFontSize(14);
+      doc.text(
+        "Particulars of income from Salaries",
+        width / 2.0,
+        topMargin + lineHeight,
+        "center"
+      );
+
+      doc.setFont("times", "italic");
+      doc.text(
+        "Annex this Schedule to the return of income if you have income from Salaries",
+        width / 2.0,
+        topMargin + 2 * lineHeight,
+        "center"
+      );
+
+      doc.autoTable({
+        theme: "grid",
+        styles: {
+          font: "times",
+          fillColor: null,
+          overflow: "linebreak",
+          textColor: [0, 0, 0],
+          cellWidth: "auto",
+          lineColor: [0, 0, 0],
+          lineWidth: 0.01,
+          valign: "middle",
+        },
+        body: [
+          ["01", "Assessment Year", "02", "TIN"],
+          ["", "2020-21", "", "889529829745"],
+        ],
+        startY: topMargin + 3 * lineHeight,
+      });
+
+      doc.autoTable({
+        theme: "plain",
+        styles: {
+          font: "times",
+          fontStyle: "bold",
+          fillColor: null,
+          overflow: "linebreak",
+          textColor: [0, 0, 0],
+          cellWidth: "auto",
+          lineColor: [0, 0, 0],
+          lineWidth: 0.01,
+          valign: "middle",
+        },
+        headStyles: {
+          fontStyle: "bold",
+        },
+        bodyStyles: {
+          fontStyle: "normal",
+        },
+        columns: [
+          { header: "id", dataKey: "id" },
+          { header: "particulars", dataKey: "particulars" },
+          { header: "amount", dataKey: "amount" },
+          { header: "taxExempted", dataKey: "taxExempted" },
+          { header: "taxable", dataKey: "taxable" },
+        ],
+        columnStyles: {
+          'amount': {
+            cellWidth: 1,
+            halign: "right",
+          },
+          'taxExempted': {
+            cellWidth: 1,
+            halign: "right",
+          },
+          'taxable': {
+            cellWidth: 1,
+            halign: "right",
+          },
+        },
+        head: [["", "Particulars", "Amount(A)", "Tax Exempted(B)", "Taxable"]],
+        body: [
+          ["03", "Basic Pay", "321120", "-", "321120"],
+          ["03", "Special pay", "321120", "-", "321120"],
+          ["03","Arrear pay (if not included in taxable income earlier)","321120","-","321120",],
+          ["03", "Dearness allowance", "321120", "-", "321120"],
+          ["03", "Medical allowance", "321120", "-", "321120"],
+          ["03", "Conveyance allowance", "321120", "-", "321120"],
+          ["03", "Festival Allowance", "321120", "-", "321120"],
+          ["03", "Allowance for support staff", "321120", "-", "321120"],
+          ["03", "Leave allowance", "321120", "-", "321120"],
+          ["03", "Honorarium/ Reward/Fee", "321120", "-", "321120"],
+          ["03", "Overtime allowance", "321120", "-", "321120"],
+          ["03", "Bonus / Ex-gratia", "321120", "-", "321120"],
+          ["03", "Other allowances (BRTC)", "321120", "-", "321120"],
+          ["03", "Employer's contribution to a recognized provident fund", "321120", "-", "321120"],
+          ["03", "Interest accrued on a recognized provident fund", "321120", "-", "321120"],
+          ["03", "Interest accrued on a recognized provident fund", "321120", "-", "321120"],
+          ["03", "Deemed income for transport facility", "321120", "-", "321120"],
+          ["03", "Deemed income for free furnished/ unfurnished accommodation", "321120", "-", "321120"],
+          ["03", "Other, if any (give detail):Exam", "321120", "-", "321120"],
+          ["03", "Total", "321120", "-", "321120"],
+        ],
+        startY: topMargin + 6 * lineHeight,
+      });
+
+      doc.setFont("times", "italic");
+      doc.text(
+        "All figures of amount are in taka(৳)",
+        width / 2.0,
+        topMargin + 10 * lineHeight,
+        "center"
+      );
+
+      // // text is placed using x, y coordinates
+      // // doc.addImage(imgData, 'JPEG', 45, 30, 90, 118);
+      // doc.setFont("times").setFontSize(22).text(420, 40, "TAX INVOICE");
+      // doc.setFont("times").setFontSize(10).text(400, 70, "NUMBER:");
+      // doc.setFont("times").setFontSize(10).text(490, 70, "123456789");
+      // doc.setFont("times").setFontSize(10).text(385, 85, "REFERENCE:");
+      // doc.setFont("times").setFontSize(10).text(490, 85, "123456789");
+      // doc.setFont("times").setFontSize(10).text(416, 100, "DATE:");
+      // doc.setFont("times").setFontSize(10).text(490, 100, "123456789");
+      // doc.setFont("times").setFontSize(10).text(392, 115, "DUE DATE:");
+      // doc.setFont("times").setFontSize(10).text(490, 115, "123456789");
+      // doc.setFont("times").setFontSize(10).text(390, 130, "SALES REP:");
+      // doc.setFont("times").setFontSize(10).text(490, 130, "123456789");
+      // doc
+      //   .setFont("times")
+      //   .setFontSize(10)
+      //   .text(330, 145, "OVERALL DISCOUNT %:");
+      // doc.setFont("times").setFontSize(10).text(490, 145, "123456789");
+      // doc.setFont("times").setFontSize(10).text(412, 160, "PAGES:");
+      // doc.setFont("times").setFontSize(10).text(490, 160, "123456789");
+      // doc.setFont("times").setFontSize(11).text(50, 230, "FROM:");
+      // doc.setFont("times").setFontSize(11).text(300, 230, "TO:");
+      // doc.setFont("times").setFontSize(18).text(50, 250, "COMPANY Inc.");
+      // doc.setFont("times").setFontSize(18).text(300, 250, "COMPANY Inc.");
+      // doc.setFont("times").setFontSize(11).text(50, 280, "VAT NO:");
+      // doc.setFont("times").setFontSize(11).text(300, 280, "CUSTOMER VAT NO:");
+      // doc
+      //   .setFont("times")
+      //   .setFontSize(10)
+      //   .text(50, 290, "1355 Market Street, Suite 900");
+      // doc
+      //   .setFont("times")
+      //   .setFontSize(10)
+      //   .text(300, 290, "1355 Market Street, Suite 900");
+      // doc
+      //   .setFont("times")
+      //   .setFontSize(10)
+      //   .text(50, 300, "San Francisco, CA 94103");
+      // doc
+      //   .setFont("times")
+      //   .setFontSize(10)
+      //   .text(300, 300, "San Francisco, CA 94103");
+      // doc.setFont("times").setFontSize(10).text(50, 310, "P: (123) 456-7890");
+      // doc.setFont("times").setFontSize(10).text(300, 310, "P: (123) 456-7890");
+
+      // doc.autoTable(columns, this.items, { margin: { top: 350 } });
+
+      // doc.setLineWidth(2);
+      // doc.line(560, 725, 40, 725);
+      // doc.save(`${this.heading}.pdf`);
+      var string = doc.output("datauristring");
+      var embed = "<embed width='100%' height='100%' src='" + string + "'/>";
+      var x = window.open();
+      x.document.open();
+      x.document.write(embed);
+      x.document.close();
+    },
+  },
+};
+</script>
