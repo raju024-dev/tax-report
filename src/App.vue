@@ -34,6 +34,7 @@
       </v-row>
       <BasicInformation />
       <Schedule24A v-if="showSchedule24A" />
+      <!-- <Test /> -->
     </v-container>
   </v-app>
 </template>
@@ -41,6 +42,7 @@
 <script>
 import BasicInformation from "./components/BasicInformation.vue";
 import Schedule24A from "./components/Schedule24A.vue";
+import Test from "./components/Test.vue";
 
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
@@ -49,6 +51,7 @@ export default {
   components: {
     BasicInformation,
     Schedule24A,
+    Test
   },
   data: () => ({
     heading: "Tax Calculator v1",
