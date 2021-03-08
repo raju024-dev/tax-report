@@ -3,53 +3,59 @@
     <v-container>
       <v-row>
         <v-col>
-          <h1>{{ heading }}</h1>
+          <h1>{{ heading }} for {{ name }}</h1>
           <v-btn @click="generatePDF"> Generate PDF </v-btn>
         </v-col>
       </v-row>
       <v-row>
         <v-col>
-          <ul>
-            <li v-for="item in listItems">
-              {{ item.title }} : {{ item.content }}
-            </li>
-          </ul>
+          <v-checkbox
+            v-model="showSchedule24A"
+            label="Schedule 24A: if you have income from Salaries"
+          ></v-checkbox>
+          <v-checkbox
+            v-model="showSchedule24B"
+            label="Schedule 24B: if you have income from house property"
+          ></v-checkbox>
+          <v-checkbox
+            v-model="showSchedule24C"
+            label="Schedule 24C: if you have income from business or profession"
+          ></v-checkbox>
+          <v-checkbox
+            v-model="showSchedule24D"
+            label="Schedule 24D: if you claim tax rebate"
+          ></v-checkbox>
         </v-col>
       </v-row>
       <v-row>
         <v-col>
-          <table id="my-table">
-            <thead>
-              <th>Title</th>
-              <th>Content</th>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Name</td>
-                <td>Saddam Hossain</td>
-              </tr>
-              <tr>
-                <td>Age</td>
-                <td>45</td>
-              </tr>
-            </tbody>
-          </table>
+          <h2 class="d-flex justify-center mb-6">Part I</h2>
         </v-col>
       </v-row>
+      <BasicInformation />
+      <Schedule24A v-if="showSchedule24A" />
     </v-container>
   </v-app>
 </template>
 
 <script>
+import BasicInformation from "./components/BasicInformation.vue";
+import Schedule24A from "./components/Schedule24A.vue";
+
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 export default {
   name: "App",
-
-  components: {},
-
+  components: {
+    BasicInformation,
+    Schedule24A,
+  },
   data: () => ({
     heading: "Tax Calculator v1",
+    showSchedule24A: "false",
+    showSchedule24B: "false",
+    showSchedule24C: "false",
+    showSchedule24D: "false",
     listItems: [
       { title: "Assessment Year", content: "2020-21" },
       {
@@ -61,7 +67,15 @@ export default {
     someText:
       "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam, iure.",
   }),
+  computed: {
+    name() {
+      return this.$store.state.name.toUpperCase();
+    },
+  },
   methods: {
+    changeName() {
+      this.$store.state.name = "New Name";
+    },
     generatePDF() {
       const columns = [
         { title: "Discription", dataKey: "discription" },
@@ -150,15 +164,15 @@ export default {
           { header: "taxable", dataKey: "taxable" },
         ],
         columnStyles: {
-          'amount': {
+          amount: {
             cellWidth: 1,
             halign: "right",
           },
-          'taxExempted': {
+          taxExempted: {
             cellWidth: 1,
             halign: "right",
           },
-          'taxable': {
+          taxable: {
             cellWidth: 1,
             halign: "right",
           },
@@ -167,7 +181,13 @@ export default {
         body: [
           ["03", "Basic Pay", "321120", "-", "321120"],
           ["03", "Special pay", "321120", "-", "321120"],
-          ["03","Arrear pay (if not included in taxable income earlier)","321120","-","321120",],
+          [
+            "03",
+            "Arrear pay (if not included in taxable income earlier)",
+            "321120",
+            "-",
+            "321120",
+          ],
           ["03", "Dearness allowance", "321120", "-", "321120"],
           ["03", "Medical allowance", "321120", "-", "321120"],
           ["03", "Conveyance allowance", "321120", "-", "321120"],
@@ -178,11 +198,41 @@ export default {
           ["03", "Overtime allowance", "321120", "-", "321120"],
           ["03", "Bonus / Ex-gratia", "321120", "-", "321120"],
           ["03", "Other allowances (BRTC)", "321120", "-", "321120"],
-          ["03", "Employer's contribution to a recognized provident fund", "321120", "-", "321120"],
-          ["03", "Interest accrued on a recognized provident fund", "321120", "-", "321120"],
-          ["03", "Interest accrued on a recognized provident fund", "321120", "-", "321120"],
-          ["03", "Deemed income for transport facility", "321120", "-", "321120"],
-          ["03", "Deemed income for free furnished/ unfurnished accommodation", "321120", "-", "321120"],
+          [
+            "03",
+            "Employer's contribution to a recognized provident fund",
+            "321120",
+            "-",
+            "321120",
+          ],
+          [
+            "03",
+            "Interest accrued on a recognized provident fund",
+            "321120",
+            "-",
+            "321120",
+          ],
+          [
+            "03",
+            "Interest accrued on a recognized provident fund",
+            "321120",
+            "-",
+            "321120",
+          ],
+          [
+            "03",
+            "Deemed income for transport facility",
+            "321120",
+            "-",
+            "321120",
+          ],
+          [
+            "03",
+            "Deemed income for free furnished/ unfurnished accommodation",
+            "321120",
+            "-",
+            "321120",
+          ],
           ["03", "Other, if any (give detail):Exam", "321120", "-", "321120"],
           ["03", "Total", "321120", "-", "321120"],
         ],
