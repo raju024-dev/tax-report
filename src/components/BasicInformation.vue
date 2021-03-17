@@ -8,7 +8,7 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-simple-table>
+          <v-simple-table dense>
             <template>
               <tbody>
                 <tr>
