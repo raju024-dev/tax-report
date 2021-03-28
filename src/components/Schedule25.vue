@@ -3,8 +3,8 @@
     <v-container>
       <v-row>
         <v-col>
-          <h3 class="d-flex justify-center mb-6">SCHEDULE 5</h3>
-          <p>
+          <h3 class="d-flex justify-center mb-6">SCHEDULE 25</h3>
+          <p class="d-flex justify-center mb-6">
             To be annexed to the Statement of Assets, Liabilities and Expenses
             (IT-10B2016)
           </p>
@@ -26,8 +26,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(share, count) in shares" :key="share.id">
-                  <td>{{ count + 1 }}</td>
+                <tr v-for="(share, index) in shares" :key="share.id">
+                  <td>{{ index + 1 }}</td>
                   <td>
                     {{ share.title }}
                   </td>
@@ -40,13 +40,12 @@
                   <td class="text-center">
                     <v-btn
                       class="my-2"
-                      fab
                       x-small
                       dark
                       color="red"
-                      @click="shares.splice(index, 1)"
+                      @click="deleteShare(share)"
                     >
-                      <v-icon>mdi-delete</v-icon>
+                      Delete
                     </v-btn>
                   </td>
                 </tr>
@@ -64,7 +63,6 @@
                       v-model="shareNumber"
                       label="No. of shares"
                       type="number"
-                      :rules="numberRules"
                     ></v-text-field>
                   </td>
                   <td>
@@ -72,12 +70,11 @@
                       v-model="shareValue"
                       label="Value(৳)"
                       type="number"
-                      :rules="numberRules"
                     ></v-text-field>
                   </td>
                   <td class="text-center">
-                    <v-btn fab x-small dark color="green" @click="addShare">
-                      <v-icon>mdi-plus</v-icon>
+                    <v-btn x-small dark color="green" @click="addShare">
+                      Add
                     </v-btn>
                   </td>
                 </tr>
@@ -86,6 +83,8 @@
           </v-simple-table>
         </v-col>
       </v-row>
+
+      <!-- Non Agricultural property -->
       <v-row>
         <v-col>
           <v-simple-table dense>
@@ -95,22 +94,15 @@
                   <th class="text-left">Sl</th>
                   <th class="text-left">
                     Non-agricultural property at cost value or any advance made
-                    for such property(description, location and size)
+                    for such property (description, location and size)
                   </th>
-                  <th class="text-left">
-                    Value at the start of income year (৳)
-                  </th>
-                  <th class="text-left">
-                    increased/ decreased during the income year (৳)
-                  </th>
-                  <th class="text-left">
-                    Value at the last date of income year (৳)
-                  </th>
+                  <th class="text-left">Value at the start of income year৳</th>
+                  <th class="text-left">Value(৳)</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(item, index) in nonAgriProperties" :key="item.id">
+                <tr v-for="(item, index) in nonAgri" :key="item.id">
                   <td>{{ index + 1 }}</td>
                   <td>
                     {{ item.title }}
@@ -127,13 +119,12 @@
                   <td class="text-center">
                     <v-btn
                       class="my-2"
-                      fab
                       x-small
                       dark
                       color="red"
-                      @click="nonAgriProperties.splice(index, 1)"
+                      @click="deleteNonAgri(item)"
                     >
-                      <v-icon>mdi-delete</v-icon>
+                      Delete
                     </v-btn>
                   </td>
                 </tr>
@@ -142,8 +133,8 @@
                   <td>
                     <v-text-field
                       v-model="nonAgriPropertyTitle"
-                      label="Title of the Property"
-                      :rules="textRules"
+                      label="Title of the property"
+                      :rules="nonAgriRules"
                     ></v-text-field>
                   </td>
                   <td>
@@ -151,29 +142,126 @@
                       v-model="nonAgriPropertyStartValue"
                       label="Starting Value(৳)"
                       type="number"
-                      :rules="numberRules"
+                      @input="changeEndValue"
                     ></v-text-field>
                   </td>
                   <td>
                     <v-text-field
                       v-model="nonAgriPropertyChangeValue"
-                      label="Change in Value(৳)"
+                      label="Changed Value(৳)"
                       type="number"
-                      :rules="numberRules"
+                      @input="changeEndValue"
                     ></v-text-field>
                   </td>
                   <td>
-                    {{nonAgriPropertyEndValue}}
+                    <v-text-field
+                      v-model="nonAgriPropertyEndValue"
+                      label="End Value(৳)"
+                      type="number"
+                      @input="changeChangedValue"
+                    ></v-text-field>
                   </td>
                   <td class="text-center">
                     <v-btn
-                      fab
                       x-small
                       dark
                       color="green"
                       @click="addNonAgriProperty"
                     >
-                      <v-icon>mdi-plus</v-icon>
+                      Add
+                    </v-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </v-col>
+      </v-row>
+
+      <!-- Agricultural property -->
+      <v-row>
+        <v-col>
+          <v-simple-table dense>
+            <template>
+              <thead>
+                <tr>
+                  <th class="text-left">Sl</th>
+                  <th class="text-left">
+                    Agricultural property at cost value or any advance made for such property (description, location and size)
+                  </th>
+                  <th class="text-left">Value at the start of income year৳</th>
+                  <th class="text-left">Value(৳)</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in agri" :key="item.id">
+                  <td>{{ index + 1 }}</td>
+                  <td>
+                    {{ item.title }}
+                  </td>
+                  <td>
+                    {{ item.startValue }}
+                  </td>
+                  <td>
+                    {{ item.changeValue }}
+                  </td>
+                  <td>
+                    {{ item.endValue }}
+                  </td>
+                  <td class="text-center">
+                    <v-btn
+                      class="my-2"
+                      x-small
+                      dark
+                      color="red"
+                      @click="deleteAgri(item)"
+                    >
+                      Delete
+                    </v-btn>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>
+                    <v-text-field
+                      v-model="agriPropertyTitle"
+                      label="Title of the property"
+                      :rules="agriRules"
+                    ></v-text-field>
+                  </td>
+                  <td>
+                    <v-text-field
+                      v-model="agriPropertyStartValue"
+                      label="Starting Value(৳)"
+                      type="number"
+                      @input="changeAgriEndValue"
+                    ></v-text-field>
+                  </td>
+                  <td>
+                    <v-text-field
+                      v-model="agriPropertyChangeValue"
+                      label="Changed Value(৳)"
+                      type="number"
+                      @input="changeAgriEndValue"
+                    ></v-text-field>
+                  </td>
+                  <td>
+                    <v-text-field
+                      v-model="agriPropertyEndValue"
+                      label="End Value(৳)"
+                      type="number"
+                      @input="changeAgriChangedValue"
+                    ></v-text-field>
+                  </td>
+                  <td class="text-center">
+                    <v-btn
+                      x-small
+                      dark
+                      color="green"
+                      @click="addAgriProperty"
+                    >
+                      Add
                     </v-btn>
                   </td>
                 </tr>
@@ -187,29 +275,32 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   data() {
     return {
-      numberRules: [],
       textRules: [],
+      nonAgriRules: [],
+      agriRules: [],
       shareID: 1,
       shareTitle: "",
       shareNumber: "",
       shareValue: "",
-      shares: [],
-      nonAgriID: 1,
-      agriID: 1,
+      nonAgriID: 1,      
       nonAgriPropertyTitle: "",
       nonAgriPropertyStartValue: "",
       nonAgriPropertyChangeValue: "",
-      nonAgriProperties: [],
-      agriProperties: [],
+      nonAgriPropertyEndValue: "",
+      agriID: 1,
+      agriPropertyTitle: "",
+      agriPropertyStartValue: "",
+      agriPropertyChangeValue: "",
+      agriPropertyEndValue: "",
     };
   },
   methods: {
     addShare() {
       if (this.shareTitle.length && this.shareNumber && this.shareValue) {
-        this.numberRules = [];
         this.textRules = [];
         this.shares.push({
           id: this.shareID++,
@@ -217,47 +308,88 @@ export default {
           number: Number(this.shareNumber),
           value: Number(this.shareValue),
         });
+        // console.log(this.shares)
         this.shareTitle = "";
         this.shareNumber = "";
         this.shareValue = "";
       } else {
-        this.numberRules = [
-          (v) => !!v || "Field is required",
-          (v) => /^\d+$/.test(v) || "Must be a number",
-        ];
         this.textRules = [(v) => !!v || "Field is required"];
       }
     },
-    addNonAgriProperty() {      
-      if (this.nonAgriPropertyTitle.length && this.nonAgriPropertyStartValue && (this.nonAgriPropertyChangeValue || this.nonAgriPropertyEndValue)) {
-        this.numberRules = [];
-        this.textRules = [];
-        this.nonAgriProperties.push({
+    deleteShare(share) {
+      this.$store.commit("deleteShare", share);
+    },
+    changeEndValue(event) {
+      this.nonAgriPropertyEndValue =
+        Number(this.nonAgriPropertyStartValue) +
+        Number(this.nonAgriPropertyChangeValue);
+    },
+    changeChangedValue(event) {
+      this.nonAgriPropertyChangeValue =
+        Number(this.nonAgriPropertyEndValue) -
+        Number(this.nonAgriPropertyStartValue);
+    },
+    addNonAgriProperty() {
+      if (this.nonAgriPropertyTitle.length) {
+        this.nonAgriRules = [];
+        this.nonAgri.push({
           id: this.nonAgriID++,
           title: this.nonAgriPropertyTitle,
           startValue: Number(this.nonAgriPropertyStartValue),
           changeValue: Number(this.nonAgriPropertyChangeValue),
-          endValue: this.nonAgriPropertyEndValue,
+          endValue: Number(this.nonAgriPropertyEndValue),
         });
+        console.log(this.nonAgri);
         this.nonAgriPropertyTitle = "";
         this.nonAgriPropertyStartValue = "";
         this.nonAgriPropertyChangeValue = "";
+        this.nonAgriPropertyEndValue = "";
       } else {
-        this.numberRules = [
-          (v) => !!v || "Field is required",
-          (v) => /^\d+$/.test(v) || "Must be a number",
-        ];
-        this.textRules = [(v) => !!v || "Field is required"];
+        this.nonAgriRules = [(v) => !!v || "Field is required"];
       }
     },
-    deleteNonAgriProperty(index) {
-      console.log("Non AGri delete", index);
+    deleteNonAgri(item) {
+      this.$store.commit("deleteNonAgri", item);
+    },
+    changeAgriEndValue(event) {
+      this.agriPropertyEndValue =
+        Number(this.agriPropertyStartValue) +
+        Number(this.agriPropertyChangeValue);
+    },
+    changeAgriChangedValue(event) {
+      this.agriPropertyChangeValue =
+        Number(this.agriPropertyEndValue) -
+        Number(this.agriPropertyStartValue);
+    },
+    addAgriProperty() {
+      if (this.agriPropertyTitle.length) {
+        this.agriRules = [];
+        this.agri.push({
+          id: this.agriID++,
+          title: this.agriPropertyTitle,
+          startValue: Number(this.agriPropertyStartValue),
+          changeValue: Number(this.agriPropertyChangeValue),
+          endValue: Number(this.agriPropertyEndValue),
+        });
+        console.log(this.agri);
+        this.agriPropertyTitle = "";
+        this.agriPropertyStartValue = "";
+        this.agriPropertyChangeValue = "";
+        this.agriPropertyEndValue = "";
+      } else {
+        this.agriRules = [(v) => !!v || "Field is required"];
+      }
+    },
+    deleteAgri(item) {
+      this.$store.commit("deleteAgri", item);
     },
   },
   computed: {
-    nonAgriPropertyEndValue: function(){
-      return Number(this.nonAgriPropertyStartValue)+Number(this.nonAgriPropertyChangeValue)
-    }
+    ...mapState({
+      shares: (state) => state.schedule25.shares,
+      nonAgri: (state) => state.schedule25.nonAgri,
+      agri: (state) => state.schedule25.agri,
+    }),
   },
 };
 </script>

@@ -31,15 +31,18 @@
           ></v-checkbox> -->
         </v-col>
       </v-row>
-      <v-row>
+      <!-- <v-row>
         <v-col>
           <h2 class="d-flex justify-center mb-6">Part I</h2>
         </v-col>
-      </v-row>
+      </v-row> -->
+
       <!-- <BasicInformation /> -->
       <!-- <Schedule24A v-if="showSchedule24A" /> -->
       <!-- <Schedule24D v-if="showSchedule24D" /> -->
+      <!-- <Schedule24B v-if="showSchedule24B" /> -->
       <!-- <Schedule25 v-if="showSchedule25" /> -->
+      <StatementOfExpenses v-if="showStatementOfExpenses" />
     </v-container>
   </v-app>
 </template>
@@ -49,7 +52,9 @@ import { mapState } from "vuex";
 import BasicInformation from "./components/BasicInformation.vue";
 import Schedule24A from "./components/Schedule24A.vue";
 import Schedule24D from "./components/Schedule24D.vue";
+import Schedule24B from "./components/Schedule24B.vue";
 import Schedule25 from "./components/Schedule25.vue";
+import StatementOfExpenses from "./components/StatementOfExpenses.vue";
 
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
@@ -58,8 +63,10 @@ export default {
   components: {
     BasicInformation,
     Schedule24A,
+    Schedule24B,
     Schedule24D,
     Schedule25,
+    StatementOfExpenses
   },
   data: () => ({
     heading: "Tax Calculator v1.0.0",
@@ -69,6 +76,7 @@ export default {
     showSchedule24C: false,
     showSchedule24D: false,
     showSchedule25: false,
+    showStatementOfExpenses: true,
     showTest1: false,
     showTestGlobal: false,
     listItems: [
@@ -85,21 +93,13 @@ export default {
   computed: mapState({
     name: (state) => state.name,
     assessmentYear: (state) => state.assessmentYear,
+    schedule24A: state=>state.schedule24A
   }),
   methods: {
     changeName() {
       this.$store.state.name = "New Name";
     },
     generatePDF() {
-      // const columns = [
-      //   { title: "Discription", dataKey: "discription" },
-      //   { title: "Quantity", dataKey: "quantity" },
-      //   { title: "UnitPrice", dataKey: "unitprice" },
-      //   { title: "Disc%", dataKey: "disk" },
-      //   { title: "Vat%", dataKey: "vat" },
-      //   { title: "ExclTotal", dataKey: "excltotal" },
-      //   { title: "InclTotal", dataKey: "incltotal" },
-      // ];
       const doc = new jsPDF({
         orientation: "p",
         unit: "in",
@@ -1049,21 +1049,27 @@ export default {
         headStyles: {
           fontStyle: "bold",
           lineColor: [255, 255, 255],
-          halign: "center"
+          halign: "center",
         },
         margin: { left: leftMargin },
         head: [[{ content: "Verification and Signature", colSpan: 3 }]],
         body: [
           [
-            {content: "15", rowSpan:3},
-            {content: "Verification", colSpan:2, styles:{fontStyle: 'bold'}}
+            { content: "15", rowSpan: 3 },
+            {
+              content: "Verification",
+              colSpan: 2,
+              styles: { fontStyle: "bold" },
+            },
           ],
           [
-            {content: "I solemnly declare that to the best of my knowledge and belief the information given in this statement is correct and complete.", colSpan:2}
+            {
+              content:
+                "I solemnly declare that to the best of my knowledge and belief the information given in this statement is correct and complete.",
+              colSpan: 2,
+            },
           ],
-          [
-            "Name:\n" + this.$store.state.name, "Signature & Date"
-          ]
+          ["Name:\n" + this.$store.state.name, "Signature & Date"],
         ],
         startY: 37 * lineHeight,
       });

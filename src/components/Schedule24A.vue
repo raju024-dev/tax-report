@@ -13,13 +13,14 @@
           </p>
         </v-col>
       </v-row>
-      
+
       <v-row>
         <v-col>
           <v-simple-table dense>
             <template>
               <thead>
                 <tr>
+                  <th class="text-left">Sl. No.</th>
                   <th class="text-left">Particulars</th>
                   <th class="text-left">Amount(A)</th>
                   <th class="text-left">Tax exempted(B)</th>
@@ -27,18 +28,24 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="particular in particulars" :key="particular.id">
+                <tr
+                  v-for="particular in schedule24A.slice(0, 19)"
+                  :key="particular.sl"
+                >
+                  <td>
+                    {{ particular.sl }}
+                  </td>
                   <td>
                     {{ particular.title }}
                   </td>
                   <td>
-                    <v-text-field v-model="particular.amount" :rules="amountRules"></v-text-field>
+                    <v-text-field
+                      v-model="particular.amount"
+                      type="number"
+                    ></v-text-field>
                   </td>
                   <td>
-                    <v-switch
-                      v-model="particular.exempted"
-                      :label="`${particular.exempted.toString()}`"
-                    ></v-switch>
+                    <v-switch v-model="particular.exempted"></v-switch>
                   </td>
                   <td>
                     {{
@@ -49,15 +56,20 @@
                   </td>
                 </tr>
                 <tr>
+                  <td></td>
                   <td><p class="font-weight-bold">Total</p></td>
                   <td>
-                    <p class="font-weight-bold">{{ totalAmount }}</p>
+                    <p class="font-weight-bold">{{ schedule24ATotalAmount }}</p>
                   </td>
                   <td>
-                    <p class="font-weight-bold">{{ totalTaxExempted }}</p>
+                    <p class="font-weight-bold">
+                      {{ schedule24ATotalExempted }}
+                    </p>
                   </td>
                   <td>
-                    <p class="font-weight-bold">{{ totalTaxable }}</p>
+                    <p class="font-weight-bold">
+                      {{ schedule24ATotalTaxable }}
+                    </p>
                   </td>
                 </tr>
               </tbody>
@@ -70,6 +82,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   data() {
     return {
@@ -240,26 +254,32 @@ export default {
   },
   methods: {},
   computed: {
-    totalAmount: function () {
+    ...mapState({
+      schedule24A: (state) => state.schedule24A,      
+    }),
+    schedule24ATotalAmount: function () {
       let sum = 0;
-      this.particulars.forEach((particular) => {
-        sum += Number(particular.amount);
+      this.schedule24A.slice(0, 19).forEach((item) => {
+        sum += Number(item.amount);
       });
-      return sum;
+      this.$store.state.schedule24A[19].amount = sum;
+      return this.$store.state.schedule24A[19].amount;
     },
-    totalTaxExempted: function () {
+    schedule24ATotalExempted: function () {
       let sum = 0;
-      this.particulars.forEach((particular) => {
-        sum += particular.exempted ? 0 : Number(particular.amount)
+      this.schedule24A.slice(0, 19).forEach((particular) => {
+        sum += particular.exempted ? Number(particular.amount) : 0;
       });
-      return sum;
+      this.$store.state.schedule24A[19].taxExempted = sum;
+      return this.$store.state.schedule24A[19].taxExempted;
     },
-    totalTaxable: function () {
+    schedule24ATotalTaxable: function () {
       let sum = 0;
-      this.particulars.forEach((particular) => {
-        sum += particular.exempted ? Number(particular.amount) : 0
+      this.schedule24A.slice(0, 19).forEach((particular) => {
+        sum += particular.exempted ? 0 : Number(particular.amount);
       });
-      return sum;
+      this.$store.state.schedule24A[19].taxable = sum;
+      return this.$store.state.schedule24A[19].taxable;
     },
   },
 };
